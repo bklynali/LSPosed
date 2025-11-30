@@ -86,22 +86,34 @@ if [ "$FLAVOR" == "zygisk" ]; then
   mkdir -p "$MODPATH/zygisk"
 
   if [ "$ARCH" = "arm" ] || [ "$ARCH" = "arm64" ]; then
-    extract "$ZIPFILE" "lib/armeabi-v7a/liblspd.so" "$MODPATH/zygisk" true
-    mv "$MODPATH/zygisk/liblspd.so" "$MODPATH/zygisk/armeabi-v7a.so"
+    # Support both structures for maximum compatibility:
+    # 1. Architecture subdirectories (standard Zygisk/APatch): zygisk/armeabi-v7a/liblspd.so
+    # 2. Direct files (some implementations): zygisk/armeabi-v7a.so
+    mkdir -p "$MODPATH/zygisk/armeabi-v7a"
+    extract "$ZIPFILE" "lib/armeabi-v7a/liblspd.so" "$MODPATH/zygisk/armeabi-v7a" true
+    # Also create direct file for backward compatibility
+    cp "$MODPATH/zygisk/armeabi-v7a/liblspd.so" "$MODPATH/zygisk/armeabi-v7a.so"
 
     if [ "$IS64BIT" = true ]; then
-      extract "$ZIPFILE" "lib/arm64-v8a/liblspd.so" "$MODPATH/zygisk" true
-      mv "$MODPATH/zygisk/liblspd.so" "$MODPATH/zygisk/arm64-v8a.so"
+      mkdir -p "$MODPATH/zygisk/arm64-v8a"
+      extract "$ZIPFILE" "lib/arm64-v8a/liblspd.so" "$MODPATH/zygisk/arm64-v8a" true
+      # Also create direct file for backward compatibility
+      cp "$MODPATH/zygisk/arm64-v8a/liblspd.so" "$MODPATH/zygisk/arm64-v8a.so"
     fi
   fi
 
   if [ "$ARCH" = "x86" ] || [ "$ARCH" = "x64" ]; then
-    extract "$ZIPFILE" "lib/x86/liblspd.so" "$MODPATH/zygisk" true
-    mv "$MODPATH/zygisk/liblspd.so" "$MODPATH/zygisk/x86.so"
+    # Support both structures for maximum compatibility
+    mkdir -p "$MODPATH/zygisk/x86"
+    extract "$ZIPFILE" "lib/x86/liblspd.so" "$MODPATH/zygisk/x86" true
+    # Also create direct file for backward compatibility
+    cp "$MODPATH/zygisk/x86/liblspd.so" "$MODPATH/zygisk/x86.so"
 
     if [ "$IS64BIT" = true ]; then
-      extract "$ZIPFILE" "lib/x86_64/liblspd.so" "$MODPATH/zygisk" true
-      mv "$MODPATH/zygisk/liblspd.so" "$MODPATH/zygisk/x86_64.so"
+      mkdir -p "$MODPATH/zygisk/x86_64"
+      extract "$ZIPFILE" "lib/x86_64/liblspd.so" "$MODPATH/zygisk/x86_64" true
+      # Also create direct file for backward compatibility
+      cp "$MODPATH/zygisk/x86_64/liblspd.so" "$MODPATH/zygisk/x86_64.so"
     fi
   fi
 fi
